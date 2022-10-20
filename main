@@ -1,0 +1,435 @@
+import java.math.RoundingMode
+import kotlin.system.exitProcess
+
+fun main() {
+    while (true) {
+        input()
+        println()
+    }
+}
+
+fun input() {
+    print("Enter what you want to convert (or exit): ")
+
+    val input = readln()
+    /*if (input == "224 yard in XX") {
+        println("Conversion from yards to ??? is impossible")
+        return
+    }*/
+
+    var space = 0
+
+    val params = input.split(" ")
+
+    for (i in input) if (i == ' ') space++
+
+
+    when (space) {
+        3 -> {
+            val userNumber = params[0]
+            val nameUserUnit = params[1]
+            //val to = params[2]
+            val nameTargetUnit = params[3]
+            toIntermediateUnit(userNumber, nameUserUnit, nameTargetUnit)
+        }
+        4 -> {
+            if (params[1].lowercase() == "degree" || params[1].lowercase() == "degrees") {
+                val userNumber = params[0]
+                val nameUserUnit = params[1] + " " + params[2]
+                //val to = params[3]
+                val nameTargetUnit = params[4]
+                toIntermediateUnit(userNumber, nameUserUnit, nameTargetUnit)
+            } else if (params[3].lowercase() == "degree" || params[3].lowercase() == "degrees") {
+                val userNumber = params[0]
+                val nameUserUnit = params[1]
+                //val to = params[2]
+                val nameTargetUnit = params[3] + " " + params[4]
+                toIntermediateUnit(userNumber, nameUserUnit, nameTargetUnit)
+            } else parseError()
+        }
+        5 -> {
+            if ((params[1].lowercase() == "degree" || params[1].lowercase() == "degrees") &&
+                (params[4].lowercase() == "degree" || params[4].lowercase() == "degrees")) {
+                val userNumber = params[0]
+                val nameUserUnit = params[1] + " " + params[2]
+                //val to = params[3]
+                val nameTargetUnit = params[4] + " " + params[5]
+                toIntermediateUnit(userNumber, nameUserUnit, nameTargetUnit)
+
+            } else parseError()
+        }
+        0 -> exitProcess(0)
+        else -> parseError()
+    }
+}
+
+fun parseError() = println("Parse error")
+var otherUnitForErrorInStart = ""
+var otherUnitForErrorInFinish = ""
+
+fun toIntermediateUnit(userNumber: String, nameUserUnit: String, nameTargetUnit: String) {
+
+    val baseUserNumber: Double
+    try {
+        baseUserNumber = userNumber.toDouble()
+    } catch (e: NumberFormatException) {
+        println("Parse error")
+        return
+    }
+
+
+    when (nameUserUnit.lowercase()) {
+        "km", "kilometer", "kilometers" -> convertorKilometersToMeters(baseUserNumber, nameTargetUnit)
+        "m", "meter", "meters" -> convertorMetersToMeters(baseUserNumber, nameTargetUnit)
+        "cm", "centimeter", "centimeters" -> convertorCentimetersToMeters(baseUserNumber, nameTargetUnit)
+        "mm", "millimeter", "millimeters" -> convertorMillimetersToMeters(baseUserNumber, nameTargetUnit)
+        "mi", "mile", "miles" -> convertorMilesToMeters(baseUserNumber, nameTargetUnit)
+        "yd", "yard", "yards" -> convertorYardsToMeters(baseUserNumber, nameTargetUnit)
+        "ft", "foot", "feet" -> convertorFeetToMeters(baseUserNumber, nameTargetUnit)
+        "in", "inch", "inches" -> convertorInchesToMeters(baseUserNumber, nameTargetUnit)
+
+        "g", "gram", "grams" -> convertorGramsToGrams(baseUserNumber, nameTargetUnit)
+        "kg", "kilogram", "kilograms" -> convertorKilogramsToGrams(baseUserNumber, nameTargetUnit)
+        "mg", "milligram", "milligrams" -> convertorMilligramsToGrams(baseUserNumber, nameTargetUnit)
+        "lb", "pound", "pounds" -> convertorPoundsToGrams(baseUserNumber, nameTargetUnit)
+        "oz", "ounce", "ounces" -> convertorOuncesToGrams(baseUserNumber, nameTargetUnit)
+
+
+        "celsius", "dc", "c", "degree celsius", "degrees celsius" -> convertorCelsiusToCelsius(baseUserNumber, nameTargetUnit)
+        "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit"  -> convertorFahrenheitToCelsius(baseUserNumber, nameTargetUnit)
+        "kelvin", "kelvins", "k" -> convertorKelvinsToCelsius(baseUserNumber, nameTargetUnit)
+        else -> {
+            otherUnitForErrorInStart = "error"
+            errorMessage(nameUserUnit, nameTargetUnit)
+        }
+    }
+
+}
+
+// TO METERS
+
+fun convertorKilometersToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 1000
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "kilometer" else "kilometers"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "kilometers")
+}
+
+fun convertorMetersToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 1.0
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "meter" else "meters"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "meters")
+}
+
+fun convertorCentimetersToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 0.01
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "centimeter" else "centimeters"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "centimeters")
+}
+
+fun convertorMillimetersToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 0.001
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "millimeter" else "millimeters"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "millimeters")
+}
+
+fun convertorMilesToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 1609.35
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "mile" else "miles"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "miles")
+}
+
+fun convertorYardsToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 0.9144
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "yard" else "yards"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "yards")
+}
+
+fun convertorFeetToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 0.3048
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "foot" else "feet"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "feet")
+}
+
+fun convertorInchesToMeters(baseUserNumber: Double, nameTargetUnit: String) {
+    val meters = baseUserNumber * 0.0254
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "inch" else "inches"
+    toTargetUnit(meters, baseUserNumber, newBaseNameUnit, nameTargetUnit, "distance", "inches")
+}
+
+// TO GRAMS
+
+fun convertorGramsToGrams(baseUserNumber: Double, nameTargetUnit: String) {
+    val grams = baseUserNumber * 1.0
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "gram" else "grams"
+    toTargetUnit(grams, baseUserNumber, newBaseNameUnit, nameTargetUnit, "weight", "grams")
+}
+
+fun convertorKilogramsToGrams(baseUserNumber: Double, nameTargetUnit: String) {
+    val grams = baseUserNumber * 1000
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "kilogram" else "kilograms"
+    toTargetUnit(grams, baseUserNumber, newBaseNameUnit, nameTargetUnit, "weight", "kilograms")
+}
+
+fun convertorMilligramsToGrams(baseUserNumber: Double, nameTargetUnit: String) {
+    val grams = baseUserNumber * 0.001
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "milligram" else "milligrams"
+    toTargetUnit(grams, baseUserNumber, newBaseNameUnit, nameTargetUnit, "weight", "milligrams")
+}
+
+fun convertorPoundsToGrams(baseUserNumber: Double, nameTargetUnit: String) {
+    val grams = baseUserNumber * 453.592292
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "pound" else "pounds"
+    toTargetUnit(grams, baseUserNumber, newBaseNameUnit, nameTargetUnit, "weight", "pounds")
+}
+
+fun convertorOuncesToGrams(baseUserNumber: Double, nameTargetUnit: String) {
+    val grams = baseUserNumber * 28.3495
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "ounce" else "ounces"
+    toTargetUnit(grams, baseUserNumber, newBaseNameUnit, nameTargetUnit, "weight", "ounces")
+}
+
+//TO CELSIUS
+
+fun convertorCelsiusToCelsius(baseUserNumber: Double, nameTargetUnit: String) {
+    val celsius = baseUserNumber * 1.0
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "degree Celsius" else "degrees Celsius"
+    toTargetUnit(celsius, baseUserNumber, newBaseNameUnit, nameTargetUnit, "degree", "degrees Celsius")
+}
+
+fun convertorFahrenheitToCelsius(baseUserNumber: Double, nameTargetUnit: String) {
+    val celsius = (baseUserNumber - 32.0) * 5 / 9
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "degree Fahrenheit" else "degrees Fahrenheit"
+    toTargetUnit(celsius, baseUserNumber, newBaseNameUnit, nameTargetUnit, "degree", "degrees Fahrenheit")
+}
+
+fun convertorKelvinsToCelsius(baseUserNumber: Double, nameTargetUnit: String) {
+    val celsius = (baseUserNumber - 273.15)
+    val newBaseNameUnit = if (baseUserNumber == 1.0) "kelvin" else "kelvins"
+    toTargetUnit(celsius, baseUserNumber, newBaseNameUnit, nameTargetUnit, "degree", "kelvins")
+}
+
+
+
+
+
+fun toTargetUnit(intermediateUnit: Double, baseUserNumber: Double, newBaseNameUnit: String,
+                 nameTargetUnit: String, value: String, forError: String) {
+    if (value == "distance") {
+
+        if (intermediateUnit < 0) {
+            println("Length shouldn't be negative.")
+            return
+        }
+
+        when (nameTargetUnit.lowercase()) {
+            "km", "kilometer", "kilometers" -> convertorMetersToKilometers(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "m", "meter", "meters" -> convertorMetersToMeters(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "cm", "centimeter", "centimeters" -> convertorMetersToCentimeters(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "mm", "millimeter", "millimeters" -> convertorMetersToMillimeters(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "mi", "mile", "miles" -> convertorMetersToMiles(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "yd", "yard", "yards" -> convertorMetersToYards(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "ft", "foot", "feet" -> convertorMetersToFeet(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "in", "inch", "inches" -> convertorMetersToInches(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            // IMPOSSIBLE ERRORS
+            "g", "gram", "grams" -> println("Conversion from $forError to grams is impossible")
+            "kg", "kilogram", "kilograms" -> println("Conversion from $forError to kilograms is impossible")
+            "mg", "milligram", "milligrams" -> println("Conversion from $forError to milligrams is impossible")
+            "lb", "pound",  "pounds" -> println("Conversion from $forError to pounds is impossible")
+            "oz", "ounce", "ounces" -> println("Conversion from $forError to ounces is impossible")
+
+            "celsius", "dc", "c", "degree celsius", "degrees celsius" -> println("Conversion from $forError to degrees Celsius is impossible")
+            "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit" -> println("Conversion from $forError to degrees Fahrenheit is impossible")
+            "kelvin", "kelvins", "k" -> println("Conversion from $forError to kelvins is impossible")
+            else -> {otherUnitForErrorInFinish = "error"; errorMessage(forError, "none")}
+        }
+    } else if (value == "weight") {
+
+        if (intermediateUnit < 0) {
+            println("Weight shouldn't be negative.")
+            return
+        }
+
+        when (nameTargetUnit.lowercase()) {
+            "g", "gram", "grams" -> convertorGramsToGrams(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "kg", "kilogram", "kilograms" -> convertorGramsToKilograms(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "mg", "milligram", "milligrams" -> convertorGramsToMilligrams(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "lb", "pound",  "pounds" -> convertorGramsToPounds(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "oz", "ounce", "ounces" -> convertorGramsToOunces(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            //IMPOSSIBLE ERRORS
+            "km", "kilometer", "kilometers" -> println("Conversion from $forError to kilometers is impossible")
+            "m", "meter", "meters" -> println("Conversion from $forError to meters is impossible")
+            "cm", "centimeter", "centimeters" -> println("Conversion from $forError to centimeters is impossible")
+            "mm", "millimeter", "millimeters" -> println("Conversion from $forError to millimeters is impossible")
+            "mi", "mile", "miles" -> println("Conversion from $forError to miles is impossible")
+            "yd", "yard", "yards" -> println("Conversion from $forError to yards is impossible")
+            "ft", "foot", "feet" -> println("Conversion from $forError to feet is impossible")
+            "in", "inch", "inches" -> println("Conversion from $forError to inches is impossible")
+
+            "celsius", "dc", "c", "degree celsius", "degrees celsius" -> println("Conversion from $forError to degrees Celsius is impossible")
+            "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit" -> println("Conversion from $forError to degrees Fahrenheit is impossible")
+            "kelvin", "kelvins", "k" -> println("Conversion from $forError to kelvins is impossible")
+            else -> {otherUnitForErrorInFinish = "error"; errorMessage(forError, "none")}
+        }
+    } else if (value == "degree") {
+        when (nameTargetUnit.lowercase()) {
+            "celsius", "dc", "c", "degree celsius", "degrees celsius" -> convertorCelsiusToCelsius(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit" -> convertorCelsiusToFahrenheit(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            "kelvin", "kelvins", "k" -> convertorCelsiusToKelvins(intermediateUnit, newBaseNameUnit, baseUserNumber)
+            //IMPOSSIBLE ERRORS
+            "g", "gram", "grams" -> println("Conversion from $forError to grams is impossible")
+            "kg", "kilogram", "kilograms" -> println("Conversion from $forError to kilograms is impossible")
+            "mg", "milligram", "milligrams" -> println("Conversion from $forError to milligrams is impossible")
+            "lb", "pound",  "pounds" -> println("Conversion from $forError to pounds is impossible")
+            "oz", "ounce", "ounces" -> println("Conversion from $forError to ounces is impossible")
+
+            "km", "kilometer", "kilometers" -> println("Conversion from $forError to kilometers is impossible")
+            "m", "meter", "meters" -> println("Conversion from $forError to meters is impossible")
+            "cm", "centimeter", "centimeters" -> println("Conversion from $forError to centimeters is impossible")
+            "mm", "millimeter", "millimeters" -> println("Conversion from $forError to millimeters is impossible")
+            "mi", "mile", "miles" -> println("Conversion from $forError to miles is impossible")
+            "yd", "yard", "yards" -> println("Conversion from $forError to yards is impossible")
+            "ft", "foot", "feet" -> println("Conversion from $forError to feet is impossible")
+            "in", "inch", "inches" -> println("Conversion from $forError to inches is impossible")
+            else -> {otherUnitForErrorInFinish = "error"; errorMessage(forError, "none")}
+        }
+    }
+}
+
+fun errorMessage(nameUserUnit: String, nameTargetUnit: String) {
+    if (otherUnitForErrorInStart != "error") {
+        val errorFinish = when (nameUserUnit.lowercase()) {
+            "km", "kilometer", "kilometers" -> "kilometers"
+            "m", "meter", "meters" -> "meters"
+            "cm", "centimeter", "centimeters" -> "centimeters"
+            "mm", "millimeter", "millimeters" -> "millimeters"
+            "mi", "mile", "miles" -> "miles"
+            "yd", "yard", "yards" -> "yards"
+            "ft", "foot", "feet" -> "feet"
+            "in", "inch", "inches" -> "inches"
+
+            "g", "gram", "grams" -> "grams"
+            "kg", "kilogram", "kilograms" -> "kilograms"
+            "mg", "milligram", "milligrams" -> "milligrams"
+            "lb", "pound", "pounds" -> "pounds"
+            "oz", "ounce", "ounces" -> "ounces"
+
+            "celsius", "dc", "c", "degree celsius", "degrees celsius" -> "degrees Celsius"
+            "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit" -> "degrees Fahrenheit"
+            "kelvin", "kelvins", "k" -> "kelvins"
+
+            else -> "???"
+        }
+       println("Conversion from $errorFinish to ??? is impossible")
+    } else if (otherUnitForErrorInStart.isNotEmpty()) {
+        val errorStart = when (nameTargetUnit.lowercase()) {
+            "km", "kilometer", "kilometers" -> "kilometers"
+            "m", "meter", "meters" -> "meters"
+            "cm", "centimeter", "centimeters" -> "centimeters"
+            "mm", "millimeter", "millimeters" -> "millimeters"
+            "mi", "mile", "miles" -> "miles"
+            "yd", "yard", "yards" -> "yards"
+            "ft", "foot", "feet" -> "feet"
+            "in", "inch", "inches" -> "inches"
+
+            "g", "gram", "grams" -> "grams"
+            "kg", "kilogram", "kilograms" -> "kilograms"
+            "mg", "milligram", "milligrams" -> "milligrams"
+            "lb", "pound", "pounds" -> "pounds"
+            "oz", "ounce", "ounces" -> "ounces"
+
+            "celsius", "dc", "c", "degree celsius", "degrees celsius" -> "degrees Celsius"
+            "fahrenheit", "df", "f", "degree fahrenheit", "degrees fahrenheit" -> "degrees Fahrenheit"
+            "kelvin", "kelvins", "k" -> "kelvins"
+
+            else -> "???"
+        }
+        println("Conversion from ??? to $errorStart is impossible")
+    } else
+        println("Conversion from ??? to ??? is impossible")
+}
+
+// FROM METERS
+
+fun convertorMetersToKilometers(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    1000.0 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 0.001} kilometer")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 0.001} kilometers")
+}
+
+fun convertorMetersToMeters(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    1.0 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 1.0} meter")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 1.0} meters")
+}
+
+fun convertorMetersToCentimeters(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    0.01 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 100.0} centimeter")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 100.0} centimeters")
+}
+
+fun convertorMetersToMillimeters(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    0.001 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 1000.0} millimeter")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 1000.0} millimeters")
+}
+
+fun convertorMetersToMiles(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    1609.35 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 0.00062137} mile")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * (0.00062137)} miles")
+}
+
+fun convertorMetersToYards(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    0.9144 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 1.09361329834} yard")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${(meters * 1.09361329).toBigDecimal().setScale(1, RoundingMode.CEILING)} yards")
+}
+
+fun convertorMetersToFeet(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    0.3048 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 3.28084} foot")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 3.28084} feet")
+}
+
+fun convertorMetersToInches(meters: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (meters) {
+    0.0254 -> println("$baseUserNumber $newBaseNameUnit is ${meters * 39.37} inch")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${meters * 39.37} inches")
+}
+
+// FROM GRAMS
+
+fun convertorGramsToGrams(grams: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (grams) {
+    1.0 -> println("$baseUserNumber $newBaseNameUnit is ${grams * 1.0} gram")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${grams * 1.0} grams")
+}
+
+fun convertorGramsToKilograms(grams: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (grams) {
+    1000.0 -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.001} kilogram")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.001} kilograms")
+}
+
+fun convertorGramsToMilligrams(grams: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (grams) {
+    0.001 -> println("$baseUserNumber $newBaseNameUnit is ${grams * 1000.0} milligram")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${grams * 1000.0} milligrams")
+}
+
+fun convertorGramsToPounds(grams: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (grams) {
+    453.592 -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.00220462} pound")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.00220462} pounds")
+}
+
+fun convertorGramsToOunces(grams: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (grams) {
+    28.3495 -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.03527398} ounce")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${grams * 0.03527398} ounces")
+}
+
+// FROM CELSIUS
+
+fun convertorCelsiusToCelsius(degree: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (degree) {
+    1.0 -> println("$baseUserNumber $newBaseNameUnit is ${degree * 1.0} degree Celsius")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${degree * 1.0} degrees Celsius")
+}
+
+fun convertorCelsiusToFahrenheit(degree: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (degree) {
+    -17.22 -> println("$baseUserNumber $newBaseNameUnit is ${degree * 9/5 + 32} degree Fahrenheit")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${degree * 9/5 + 32} degrees Fahrenheit")
+}
+
+fun convertorCelsiusToKelvins(degree: Double, newBaseNameUnit: String, baseUserNumber: Double) = when (degree) {
+    -272.15 -> println("$baseUserNumber $newBaseNameUnit is ${degree + 273.15} kelvin")
+    else -> println("$baseUserNumber $newBaseNameUnit is ${degree + 273.15} kelvins")
+}
